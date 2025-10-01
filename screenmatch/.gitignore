@@ -3,3 +3,6 @@ bin
 lib
 .env
 src/*.class
+.idea
+*.iml
+out/
