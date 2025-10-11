@@ -30,4 +30,7 @@ public class Address {
                 + neighborhood + ", city=" + city + ", state=" + state + "]";
     }
 
+    public String getZipCode() {
+        return zipCode;
+    }
 }

@@ -11,21 +11,20 @@ public class ZipCodeQuery {
     public AddressViaCep getAddressViaCep(String zipCode) {
         URI address = URI.create("https://viacep.com.br/ws/" + zipCode + "/json/");
 
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(address)
                 .build();
 
-        HttpResponse<String> response = null;
         try {
-            response = HttpClient
+            HttpResponse<String> response = HttpClient
                     .newHttpClient()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
+            return new Gson().fromJson(response.body(), AddressViaCep.class);
+
+        } catch (Exception e) {
             throw new RuntimeException("Is not possible to query the zip code");
         }
 
-        return new Gson().fromJson(response.body(), AddressViaCep.class);
     }
 
 }
