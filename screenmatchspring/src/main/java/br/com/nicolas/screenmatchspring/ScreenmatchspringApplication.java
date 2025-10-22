@@ -1,5 +1,6 @@
 package br.com.nicolas.screenmatchspring;
 
+import br.com.nicolas.screenmatchspring.model.DadosEpisodio;
 import br.com.nicolas.screenmatchspring.model.DadosSerie;
 import br.com.nicolas.screenmatchspring.service.ConsumoAPI;
 import br.com.nicolas.screenmatchspring.service.ConverteDados;
@@ -27,6 +28,11 @@ public class ScreenmatchspringApplication implements CommandLineRunner {
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
 
         System.out.println(dados);
+        json = consumoAPI.obterDados("https://www.omdbapi.com/?t=gilmore+girls&Season=1&episode=2&apikey=e5b275f7");
+
+
+        DadosEpisodio dadosEpisodio = conversor.obterDados(json, DadosEpisodio.class);
+        System.out.println(dadosEpisodio);
 
 
     }
