@@ -52,7 +52,7 @@ public class AgendaDeConsultas {
         var paciente = pacienteRepository.getReferenceById(dados.idPaciente());
 
 
-        var consulta = new Consulta(null, medico, paciente, dados.data(), false, null);
+        var consulta = new Consulta(medico, paciente, dados.data());
         consultaRepository.save(consulta);
 
         return new DadosDetalhamentoConsulta(consulta);

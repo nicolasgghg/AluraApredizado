@@ -1,0 +1,2 @@
+ALTER TABLE consultas
+    MODIFY COLUMN cancelada TINYINT(1) NOT NULL DEFAULT 0;
