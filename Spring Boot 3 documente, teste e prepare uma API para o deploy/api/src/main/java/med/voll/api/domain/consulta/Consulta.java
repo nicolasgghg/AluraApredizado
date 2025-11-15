@@ -32,4 +32,18 @@ public class Consulta {
 
     private LocalDateTime data;
 
+    private Boolean cancelada;
+
+    @Enumerated(EnumType.STRING)
+    private MotivoCancelamento motivoCancelamento;
+
+    public void cancelar(MotivoCancelamento motivo) {
+        if (this.cancelada != null && this.cancelada) {
+            throw new IllegalStateException("Consulta já está cancelada.");
+        }
+
+        this.cancelada = true;
+        this.motivoCancelamento = motivo;
+    }
+
 }
