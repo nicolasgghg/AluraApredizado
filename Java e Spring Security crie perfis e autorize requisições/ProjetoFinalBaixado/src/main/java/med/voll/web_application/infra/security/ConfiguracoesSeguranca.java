@@ -24,14 +24,15 @@ public class ConfiguracoesSeguranca {
     public SecurityFilterChain filtrosSeguranca(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers("/css/**", "/js/**", "/assets/**", "/", "/index", "/home", "/esqueci-minha-senha").permitAll();
-//                    req.requestMatchers("/pacientes/**").hasRole("ATENDENTE");
-//                    req.requestMatchers(HttpMethod.GET, "/medicos").hasAnyRole("ATENDENTE", "PACIENTE");
-//                    req.requestMatchers("/medicos/**").hasRole("ATENDENTE");
-//                    req.requestMatchers(HttpMethod.POST, "/consultas/**").hasAnyRole("ATENDENTE", "PACIENTE");
-//                    req.requestMatchers(HttpMethod.PUT, "/consultas/**").hasAnyRole("ATENDENTE", "PACIENTE");
-//                    req.anyRequest().authenticated();
-                })
+                        req.requestMatchers("/css/**", "/js/**", "/assets/**",
+                                "/", "/index", "/home", "/esqueci-minha-senha", "recuperar-conta").permitAll();
+//                        req.requestMatchers("/pacientes/**").hasRole("ATENDENTE");
+//                        req.requestMatchers(HttpMethod.GET, "/medicos").hasAnyRole("ATENDENTE", "PACIENTE");
+//                        req.requestMatchers("/medicos/**").hasRole("ATENDENTE");
+//                        req.requestMatchers(HttpMethod.POST, "/consultas/**").hasAnyRole("ATENDENTE", "PACIENTE");
+//                        req.requestMatchers(HttpMethod.PUT, "/consultas/**").hasAnyRole("ATENDENTE", "PACIENTE");
+                    req.anyRequest().authenticated();
+                    })
                 .formLogin(form -> form.loginPage("/login")
                         .defaultSuccessUrl("/")
                         .permitAll())
@@ -46,7 +47,7 @@ public class ConfiguracoesSeguranca {
     }
 
     @Bean
-    public PasswordEncoder codificadorSenha() {
+    public PasswordEncoder codificadorSenha(){
         return new BCryptPasswordEncoder();
     }
 }
