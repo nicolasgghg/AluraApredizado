@@ -1,9 +1,15 @@
 package br.com.forum_hub.controller;
 
+import br.com.forum_hub.domain.autenticacao.DadosToken;
+import br.com.forum_hub.domain.autenticacao.TokenService;
 import br.com.forum_hub.domain.autenticacao.github.LoginGithubService;
+import br.com.forum_hub.domain.usuario.UsuarioRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +23,14 @@ public class LoginGithubController {
 
     private final LoginGithubService loginGithubService;
 
-    public LoginGithubController(LoginGithubService loginGithubService) {
+    private final UsuarioRepository usuarioRepository;
+
+    private final TokenService tokenService;
+
+    public LoginGithubController(LoginGithubService loginGithubService, UsuarioRepository usuarioRepository, TokenService tokenService) {
         this.loginGithubService = loginGithubService;
+        this.usuarioRepository = usuarioRepository;
+        this.tokenService = tokenService;
     }
 
 
@@ -34,9 +46,19 @@ public class LoginGithubController {
     }
 
     @GetMapping("/autorizado")
-    public ResponseEntity<String> obterToken(@RequestParam String code) {
-        var token = loginGithubService.obterToken(code);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<DadosToken> autenticarUsuario0Auth(@RequestParam String code) {
+        var email = loginGithubService.obterEmail(code);
+
+        var usuario = usuarioRepository.findByEmailIgnoreCaseAndVerificadoTrue(email)
+                .orElseThrow();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String tokenAcesso = tokenService.gerarToken(usuario);
+        String tokenAtualizacao = tokenService.gerarRefreshToken(usuario);
+
+        return ResponseEntity.ok(new DadosToken(tokenAcesso, tokenAtualizacao));
     }
 
 

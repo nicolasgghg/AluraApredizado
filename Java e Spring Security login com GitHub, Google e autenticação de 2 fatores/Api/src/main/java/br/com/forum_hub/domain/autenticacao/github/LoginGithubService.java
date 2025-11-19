@@ -2,6 +2,7 @@ package br.com.forum_hub.domain.autenticacao.github;
 
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -29,10 +30,10 @@ public class LoginGithubService {
         return "https://github.com/login/oauth/authorize" +
                 "?client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
-                "&scope=read:user,user:email";
+                "&scope=read:user,user:email, public_repo";
     }
 
-    public String obterToken(String code) {
+    private String obterToken(String code) {
         var response = restClient
                 .post()
                 .uri("https://github.com/login/oauth/access_token")
@@ -40,9 +41,43 @@ public class LoginGithubService {
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Map.of("code", code, "client_id", clientId, "client_secret", clientSecret, "redirect_uri", redirectUri))
                 .retrieve()
+                .body(Map.class);
+
+
+        return response.get("access_token").toString();
+    }
+
+    public String obterEmail(String code) {
+        var token = obterToken(code);
+
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var response = restClient
+                .get()
+                .uri("https://api.github.com/user/emails")
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                    .body(DadosEmail[].class);
+
+        var repositorios = restClient
+                .get()
+                .uri("https://api.github.com/user/repos")
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
                 .body(String.class);
 
-        return response;
+
+        for (DadosEmail email : response) {
+            if (email.primary() || email.verified()) {
+                return email.email();
+            }
+        }
+
+        return null;
+
     }
 
 }
