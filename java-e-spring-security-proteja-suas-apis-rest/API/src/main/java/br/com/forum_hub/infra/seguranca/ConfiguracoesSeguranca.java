@@ -28,6 +28,13 @@ public class ConfiguracoesSeguranca {
     @Bean
     public SecurityFilterChain filtrosSeguranca(HttpSecurity http) throws Exception {
         return http
+                .authorizeHttpRequests(
+                        req ->
+                        {
+                            req.requestMatchers("/login").permitAll();
+                            req.requestMatchers("/usuarios");
+                        }
+                )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(filtroTokenAcesso, UsernamePasswordAuthenticationFilter.class)
