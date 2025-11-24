@@ -31,7 +31,7 @@ public class ConfiguracoesSeguranca {
                 .authorizeHttpRequests(
                         req ->
                         {
-                            req.requestMatchers("/login").permitAll();
+                            req.requestMatchers("/login", "/atualizar-tokenggit ").permitAll();
                             req.requestMatchers("/usuarios");
                         }
                 )
