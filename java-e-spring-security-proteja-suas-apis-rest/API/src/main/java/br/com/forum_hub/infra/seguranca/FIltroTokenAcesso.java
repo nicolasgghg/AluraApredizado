@@ -36,7 +36,7 @@ public class FIltroTokenAcesso extends OncePerRequestFilter {
 
         if (token != null) {
             String email = tokenService.verificarToken(token);
-            Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email).
+            Usuario usuario = usuarioRepository.findByEmailIgnoreCaseAndVerificadoTrue(email).
                     orElseThrow(() -> new RegraDeNegocioException("Usuário não encontrado!"));
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());

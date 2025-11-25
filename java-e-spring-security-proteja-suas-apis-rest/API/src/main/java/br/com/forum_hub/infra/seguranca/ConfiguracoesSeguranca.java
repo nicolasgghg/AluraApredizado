@@ -31,8 +31,8 @@ public class ConfiguracoesSeguranca {
                 .authorizeHttpRequests(
                         req ->
                         {
-                            req.requestMatchers("/login", "/atualizar-tokenggit ").permitAll();
-                            req.requestMatchers("/usuarios");
+                            req.requestMatchers("/login", "/atualizar-token", "/registrar").permitAll();
+                            req.requestMatchers("/usuarios").authenticated();
                         }
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
