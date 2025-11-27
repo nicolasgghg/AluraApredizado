@@ -58,8 +58,8 @@ public class RespostaService {
 
         var topico = resposta.getTopico();
 
-        if (!usuarioTemPermissoes(logado, topico.getAutor())) {
-            throw new RegraDeNegocioException("Você não pode marcar essa resposta com solução!");
+        if (usuarioNaoTemPermissoes(logado, topico.getAutor())) {
+            throw new RegraDeNegocioException("Você não pode marcar essa resposta como solução!");
         }
 
         if (topico.getStatus() == Status.RESOLVIDO)
@@ -69,18 +69,10 @@ public class RespostaService {
         return resposta.marcarComoSolucao();
     }
 
-    private boolean usuarioTemPermissoes(Usuario logado, Usuario autor) {
-        for (GrantedAuthority autoridade : logado.getAuthorities()) {
-
-           var autoridadeAlcancaveis = roleHierarchy.getReachableGrantedAuthorities(List.of(autoridade));
-
-           for (GrantedAuthority perfil : autoridadeAlcancaveis) {
-                if(perfil.getAuthority().equals("ROLE_INSTRUTOR") || logado.getId().equals(autor.getId())) {
-                    return true;
-                };
-           }
-        }
-        return false;
+    private boolean usuarioNaoTemPermissoes(Usuario logado, Usuario autor) {
+        return logado.getAuthorities().stream()
+                .flatMap(autoridade -> roleHierarchy.getReachableGrantedAuthorities(List.of(autoridade)).stream())
+                .noneMatch(perfil -> perfil.getAuthority().equals("ROLE_INSTRUTOR") || perfil.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @Transactional
