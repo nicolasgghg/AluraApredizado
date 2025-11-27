@@ -24,20 +24,20 @@ public class RespostaService {
     }
 
     @Transactional
-    public Resposta cadastrar(DadosCadastroResposta dados, Long idTopico, Usuario autor) {
+    public Resposta cadastrar(DadosCadastroResposta dados, Long idTopico) {
         var topico = topicoService.buscarPeloId(idTopico);
 
-        if (!topico.estaAberto()) {
+        if(!topico.estaAberto()) {
             throw new RegraDeNegocioException("O tópico está fechado! Você não pode adicionar mais respostas.");
         }
 
-        if (topico.getQuantidadeRespostas() == 0) {
+        if(topico.getQuantidadeRespostas() == 0) {
             topico.alterarStatus(Status.RESPONDIDO);
         }
 
         topico.incrementarRespostas();
 
-        var resposta = new Resposta(dados, topico, autor);
+        var resposta = new Resposta(dados, topico);
         return repository.save(resposta);
     }
 
@@ -45,17 +45,15 @@ public class RespostaService {
     public Resposta atualizar(DadosAtualizacaoResposta dados, Usuario logado) {
         var resposta = buscarPeloId(dados.id());
 
-        if(hierarquiaService.usuarioNaoTemPermissoes(logado, resposta.getAutor(), "ROLE_MODERADOR")){
-            throw new RegraDeNegocioException("Você não pode atualizar essa resposta!");
-        }
+        if(hierarquiaService.usuarioNaoTemPermissoes(logado, resposta.getTopico().getAutor(), "ROLE_MODERADOR"))
+            throw new AccessDeniedException("Você não pode editar essa resposta!");
 
         return resposta.atualizarInformacoes(dados);
     }
 
-    public List<Resposta> buscarRespostasTopico(Long id) {
+    public List<Resposta> buscarRespostasTopico(Long id){
         return repository.findByTopicoId(id);
     }
-
 
     @Transactional
     public Resposta marcarComoSolucao(Long id, Usuario logado) {
@@ -63,13 +61,11 @@ public class RespostaService {
 
         var topico = resposta.getTopico();
 
-        if (hierarquiaService.usuarioNaoTemPermissoes(logado, topico.getAutor(), "ROLE_INSTRUTOR")) {
+        if(hierarquiaService.usuarioNaoTemPermissoes(logado, topico.getAutor(), "ROLE_INSTRUTOR"))
             throw new AccessDeniedException("Você não pode marcar essa resposta como solução!");
-        }
 
-        if (topico.getStatus() == Status.RESOLVIDO) {
+        if(topico.getStatus() == Status.RESOLVIDO)
             throw new RegraDeNegocioException("O tópico já foi solucionado! Você não pode marcar mais de uma resposta como solução.");
-        }
 
         topico.alterarStatus(Status.RESOLVIDO);
         return resposta.marcarComoSolucao();
@@ -80,16 +76,15 @@ public class RespostaService {
         var resposta = buscarPeloId(id);
         var topico = resposta.getTopico();
 
-        if (hierarquiaService.usuarioNaoTemPermissoes(logado, topico.getAutor(), "ROLE_MODERADOR")) {
+        if(hierarquiaService.usuarioNaoTemPermissoes(logado, topico.getAutor(), "ROLE_MODERADOR"))
             throw new AccessDeniedException("Você não pode apagar essa resposta!");
-        }
 
         repository.deleteById(id);
 
         topico.decrementarRespostas();
         if (topico.getQuantidadeRespostas() == 0)
             topico.alterarStatus(Status.NAO_RESPONDIDO);
-        else if (resposta.ehSolucao())
+        else if(resposta.ehSolucao())
             topico.alterarStatus(Status.RESPONDIDO);
     }
 
