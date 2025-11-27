@@ -34,7 +34,7 @@ public class ConfiguracoesSeguranca {
                 .authorizeHttpRequests(
                         req ->
                         {
-                            req.requestMatchers("/login", "/atualizar-token", "/registrar", "/verificar-conta").permitAll();
+                            req.requestMatchers("/login", "/atualizar-token", "/registrar", "verificar-conta").permitAll();
 
                             req.requestMatchers(HttpMethod.GET, "/cursos").permitAll();
                             req.requestMatchers(HttpMethod.GET, "/topicos/**").permitAll();
@@ -48,7 +48,7 @@ public class ConfiguracoesSeguranca {
                             req.requestMatchers(HttpMethod.PATCH, "/topicos/**").hasRole("MODERADOR");
 
                             req.requestMatchers(HttpMethod.PATCH, "/adicionar-perfil/**").hasRole("ADMIN");
-
+                            req.requestMatchers(HttpMethod.PATCH, "/reativar-conta/**").hasRole("ADMIN");
 
                             req.anyRequest().authenticated();
                         }
