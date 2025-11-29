@@ -3,6 +3,7 @@ package med.voll.web_application.infra.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -43,6 +44,11 @@ public class ConfiguracoesSeguranca {
                 .formLogin(form -> form.loginPage("/login")
                         .defaultSuccessUrl("/")
                         .permitAll())
+                .logout(logout -> logout.logoutSuccessUrl("/login?logout")
+                        .permitAll())
+                .rememberMe(rememberMe -> rememberMe.key("SECRET_KEY")
+                        .alwaysRemember(true))
+                .csrf(Customizer.withDefaults())
                 .build();
 
     }
