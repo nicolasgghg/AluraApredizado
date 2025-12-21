@@ -1,14 +1,13 @@
 package br.com.alurafood.pedidos.amqp;
 
 import br.com.alurafood.pedidos.dto.PagamentoDto;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PagamentoListener {
 
-    @RabbitListener(queues = "pagamento.concluido")
+    @RabbitListener(queues = "pagamentos.detalhes-pedido")
     public void recebeMensagem(PagamentoDto pagamento){
         String message = """
                 Dados do pagamento: %s
