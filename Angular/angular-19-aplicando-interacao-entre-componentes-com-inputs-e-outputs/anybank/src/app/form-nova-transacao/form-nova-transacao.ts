@@ -1,11 +1,22 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-form-nova-transacao',
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './form-nova-transacao.html',
   styleUrl: './form-nova-transacao.css',
 })
 export class FormNovaTransacao {
+
+  valorTrasacao = "";
+  tipoTransacao = "";
+ 
+  aoSubmeter() {
+    console.log(this.tipoTransacao);
+    console.log(this.valorTrasacao);
+  }
+
+   
 
 }
