@@ -1,18 +1,37 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { Banner } from "./banner/banner";
 import { FormNovaTransacao } from "./form-nova-transacao/form-nova-transacao";
-import { Transacao } from './modelos/transacao';
+import { TipoTransacao, Transacao } from './modelos/transacao';
+import { Extrato } from "./extrato/extrato";
 
 @Component({
   selector: 'app-root',
-  imports: [Banner, FormNovaTransacao],
+  imports: [Banner, FormNovaTransacao, Extrato],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  processarTransacao(transacao: Transacao) {
+  transacoes = signal<Transacao[]>([]);
 
-    console.log(transacao);
-    
+  saldo = computed(()=>{
+    return this.transacoes().reduce((acc, transacaoAtual) => {
+      switch (transacaoAtual.tipo) {
+        case TipoTransacao.DEPOSITO:
+          return acc + transacaoAtual.valor;
+        case TipoTransacao.SAQUE:
+          return acc - transacaoAtual.valor;
+        default:
+          throw new Error('Transação inválida');
+      }
+    }, 0)
+  })
+
+
+  processarTransacao(transacao: Transacao) {
+    if (transacao.tipo === TipoTransacao.SAQUE && transacao.valor > this.saldo()) {
+      return alert('Saldo insuficiente!');
+    }
+    this.transacoes.update((listaAtual) => [transacao, ...listaAtual]);
   }
+
 }
