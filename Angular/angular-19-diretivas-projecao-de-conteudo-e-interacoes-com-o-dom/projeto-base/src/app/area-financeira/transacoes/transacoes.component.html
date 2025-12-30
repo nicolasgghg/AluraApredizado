@@ -18,6 +18,6 @@
       </ul>
   
 
-      <app-botao-adicionar-transacao class="botao-adicionar-transacao" />
+      <app-botao-adicionar-transacao class="botao-adicionar-transacao" (transacaoCriada)="transacaoCriada.emit($event)" />
     </div>
 </app-card>
