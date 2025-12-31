@@ -20,7 +20,7 @@
  
       @for (tipo of tipoTransacao | keyvalue; track tipo.key) {
         <label class="label-grupo-radio">
-          <input [(ngModel)]="novaTransacaoForm.tipo" type="radio" name="tipo-transacao" [value]="tipo.key" required>
+          <input [(ngModel)]="novaTransacaoForm.tipo" type="radio" name="tipo-transacao" [value]="tipo.value" required>
           {{ tipo.value }}
         </label>
       }
